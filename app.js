@@ -6,6 +6,12 @@ $(document).ready( function() {
 		var tags = $(this).find("input[name='tags']").val();
 		getUnanswered(tags);
 	});
+
+	$('.inspiration-getter').submit(function(event) {
+		$('.results').html('');
+		var answerers = $(this).find("input[name='answerers']").val();
+		getTopAnswerers(answerers);
+	});
 });
 
 // this function takes the question object returned by StackOverflow 
@@ -54,6 +60,27 @@ var showError = function(error){
 	var errorElem = $('.templates .error').clone();
 	var errorText = '<p>' + error + '</p>';
 	errorElem.append(errorText);
+};
+
+var getTopAnswerers = function(tags) {
+	var request = {
+		site: 'stackoverflow',
+		filter: 'default'
+	};
+
+	var result = $.ajax({
+		url: "http://api.stackexchange.com/2.2/tags/" + tags + "/top-answerers/all_time",
+		data: request,
+		dataType: "jsonp",
+		type: "GET",
+	})
+	.done(function(result) {
+		alert(result);
+	})
+	.fail(function(jqXHR, error, errorThrown){
+		var errorElem = showError(error);
+		$('.search-results').append(errorElem);
+	})
 };
 
 // takes a string of semi-colon separated tags to be searched
