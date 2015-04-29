@@ -47,6 +47,28 @@ var showQuestion = function(question) {
 	return result;
 };
 
+var showTopAnswerer = function(question) {
+	
+	// clone our result template code
+	var result = $('.templates .question2').clone();
+	
+	var scoreElem = result.find('.score');
+	scoreElem.text(question.score); 
+
+	var postcount = result.find('.postcount');
+	postcount.text(question.post_count);
+
+	var profilelink = result.find('.profilelink');
+	profilelink.html('<p>Name: <a target="_blank" href=http://stackoverflow.com/users/' + question.user.user_id + ' >' +
+													question.user.display_name +
+												'</a>' +
+							'</p>' +
+ 							'<p>Reputation: ' + question.user.reputation + '</p>'
+	);
+
+	return result;
+};
+
 
 // this function takes the results object from StackOverflow
 // and creates info about search results to be appended to DOM
@@ -64,6 +86,7 @@ var showError = function(error){
 
 var getTopAnswerers = function(tags) {
 	var request = {
+		tagged: tags,
 		site: 'stackoverflow',
 		filter: 'default'
 	};
@@ -75,7 +98,19 @@ var getTopAnswerers = function(tags) {
 		type: "GET",
 	})
 	.done(function(result) {
-		alert(result);
+		
+		var searchResults = showSearchResults(request.tagged, result.items.length);
+
+		$('.search-results').html(searchResults);
+
+		$.each(result.items, function(i, item) {
+
+			var question = showTopAnswerer(item);
+			$('.results').append(question);
+
+		//	alert(result);
+
+		});
 	})
 	.fail(function(jqXHR, error, errorThrown){
 		var errorElem = showError(error);
